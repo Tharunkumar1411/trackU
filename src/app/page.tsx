@@ -13,9 +13,9 @@ export default function Home() {
   useEffect(() => {
     // Check if user is authenticated
     const isAuthenticated = localStorage.getItem('isAuthenticated');
-    // if (!isAuthenticated) {
-    //   router.push('/login');
-    // }
+    if (!isAuthenticated) {
+      router.push('/login');
+    }
   }, [router]);
 
   return (
