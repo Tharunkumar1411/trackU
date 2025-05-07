@@ -40,7 +40,7 @@ export default function Schedule() {
     setActiveTimer(id);
   };
 
-  const handleNewCard = (card: Omit<StudyItem, 'completed'>) => {
+  const handleNewCard = (card: Omit<StudyItem, 'id' | 'completed'>) => {
     const newItem: StudyItem = {
       id: Date.now().toString(),
       ...card,
