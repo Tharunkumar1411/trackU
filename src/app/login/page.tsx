@@ -3,44 +3,19 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { FirebaseError } from 'firebase/app';
-import { auth } from '@/lib/firebase';
+import { useAuthStore } from '@/store/authStore';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { login, isLoading, error, setError } = useAuthStore();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setIsLoading(true);
-
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      
-      // Store user info in localStorage
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('userEmail', user.email || '');
-      
-      router.push('/');
-    } catch (error) {
-      let errorMessage = 'Failed to sign in. Please try again.';
-      if (error instanceof FirebaseError) {
-        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-          errorMessage = 'Invalid email or password';
-        } else if (error.code === 'auth/too-many-requests') {
-          errorMessage = 'Too many failed attempts. Please try again later.';
-        }
-      }
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
+    setError(null);
+    await login(email, password);
+    router.push('/');
   };
 
   return (

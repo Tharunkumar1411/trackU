@@ -69,7 +69,7 @@ export default function StudyCardManager({ onNewCard }: StudyCardManagerProps) {
               <input
                 type="number"
                 value={newCard.duration}
-                onChange={(e) => setNewCard({ ...newCard, duration: parseInt(e.target.value) || 30 })}
+                onChange={(e) => setNewCard({ ...newCard, duration: parseInt(e.target.value) })}
                 min="1"
                 className="w-full px-4 py-2 text-black rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
               />

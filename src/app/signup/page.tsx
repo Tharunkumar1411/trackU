@@ -3,21 +3,18 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { FirebaseError } from 'firebase/app';
-import { auth } from '@/lib/firebase';
+import { useAuthStore } from '@/store/authStore';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { signup, isLoading, error, setError } = useAuthStore();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError(null);
 
     if (password !== confirmPassword) {
       setError('Passwords do not match');
@@ -29,32 +26,8 @@ export default function SignupPage() {
       return;
     }
 
-    setIsLoading(true);
-
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      
-      // Store user info in localStorage
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('userEmail', user.email || '');
-      
-      router.push('/');
-    } catch (error) {
-      let errorMessage = 'Failed to create account. Please try again.';
-      if (error instanceof FirebaseError) {
-        if (error.code === 'auth/email-already-in-use') {
-          errorMessage = 'An account with this email already exists';
-        } else if (error.code === 'auth/invalid-email') {
-          errorMessage = 'Invalid email address';
-        } else if (error.code === 'auth/weak-password') {
-          errorMessage = 'Password is too weak';
-        }
-      }
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
+    await signup(email, password);
+    router.push('/');
   };
 
   return (
